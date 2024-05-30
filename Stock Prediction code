@@ -1,0 +1,93 @@
+#include <stdio.h>
+struct Stock {
+    char symbol[10];
+    double price_to_earnings_ratio;
+    double dividend_yield;
+    double growth_potential;
+};
+void merge(struct Stock arr[], int beg, int mid, int end, char key[]) {
+    int i, j, k;
+    int n1 = mid - beg + 1;
+    int n2 = end - mid;
+    struct Stock leftarray[n1], rightarray[n2];
+    for (i = 0; i < n1; i++)
+        leftarray[i] = arr[beg + i];
+    for (j = 0; j < n2; j++)
+        rightarray[j] = arr[mid + 1 + j];
+    i = 0;
+    j = 0;
+    k = beg;
+    while (i < n1 && j < n2) {
+        if ((key[0] == 'p' && leftarray[i].price_to_earnings_ratio <= rightarray[j].price_to_earnings_ratio) ||
+            (key[0] == 'd' && leftarray[i].dividend_yield >= rightarray[j].dividend_yield) ||
+            (key[0] == 'g' && leftarray[i].growth_potential <= rightarray[j].growth_potential)) {
+            arr[k] = leftarray[i];
+            i++;
+        } else {
+            arr[k] = rightarray[j];
+            j++;
+        }
+        k++;
+    }
+    while (i < n1) {
+        arr[k] = leftarray[i];
+        i++;
+        k++;
+    }
+    while (j < n2) {
+        arr[k] = rightarray[j];
+        j++;
+        k++;
+    }
+}
+void mergeSort(struct Stock arr[], int l, int r, char key[]) {
+    if (l < r) {
+        int mid = l + (r - l) / 2;
+        mergeSort(arr, l, mid, key);
+        mergeSort(arr, mid + 1, r, key);
+        merge(arr, l, mid, r, key);
+    }
+}
+int main() {
+    int n;
+    printf("Enter the number of stocks: ");
+    scanf("%d", &n);
+    struct Stock stocks[n];
+    for (int i = 0; i < n; i++) {
+        printf("Enter details for stock %d:\n", i + 1);
+        printf("Symbol: ");
+        scanf("%s", stocks[i].symbol);
+        printf("Price-to-earnings ratio: ");
+        scanf("%lf", &stocks[i].price_to_earnings_ratio);
+        printf("Dividend yield: ");
+        scanf("%lf", &stocks[i].dividend_yield);
+        printf("Growth potential: ");
+        scanf("%lf", &stocks[i].growth_potential);
+    }
+    char key[30];
+    printf("\nEnter sorting key (p for price_to_earnings_ratio, d for dividend_yield, g for growth_potential): ");
+    scanf("%s", key);
+    mergeSort(stocks, 0, n - 1, key);
+    printf("\nSorted by ");
+    if (key[0] == 'p') {
+        printf("Price-to-Earnings Ratio:\n");
+    } else if (key[0] == 'd') {
+        printf("Dividend Yield:\n");
+    } else if (key[0] == 'g') {
+        printf("Growth Potential:\n");
+    } else {
+        printf("Invalid sorting key!\n");
+        return 1;
+    }
+    for (int i = 0; i < n; i++) {
+        printf("%s: ", stocks[i].symbol);
+        if (key[0] == 'p') {
+            printf("P/E Ratio - %f\n", stocks[i].price_to_earnings_ratio);
+        } else if (key[0] == 'd') {
+            printf("Dividend Yield - %f\n", stocks[i].dividend_yield);
+        } else if (key[0] == 'g') {
+            printf("Growth Potential - %f\n", stocks[i].growth_potential);
+        }
+    }
+    return 0;
+}
